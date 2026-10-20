@@ -1,0 +1,11 @@
+name: graphiti-memory
+description: >-
+  A self-hosted Graphiti server's temporal knowledge graph under the shared Memory label: the
+  facts Graphiti has extracted, each with the window in which it held (valid_at / invalid_at),
+  recalled through the server's own hybrid search, so "what do you remember about X" answers from
+  Graphiti alongside the assistant's own memory and every other system.
+version: 0.1.0
+# The provenance label every node this realm owns carries beside its type: :GraphitiMemory:Memory:Graphiti.
+realmLabel: Graphiti
+author: Embabel
+tags: [memory, graphiti, zep, temporal]

@@ -1,0 +1,312 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "FastAPI",
+    "version": "0.1.0"
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:8000"
+    }
+  ],
+  "paths": {
+    "/search": {
+      "post": {
+        "summary": "Search",
+        "operationId": "search_search_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "group_ids": {
+                    "anyOf": [
+                      {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "title": "Group Ids",
+                    "description": "The group ids for the memories to search"
+                  },
+                  "query": {
+                    "type": "string",
+                    "title": "Query"
+                  },
+                  "max_facts": {
+                    "type": "integer",
+                    "title": "Max Facts",
+                    "description": "The maximum number of facts to retrieve",
+                    "default": 10
+                  }
+                },
+                "type": "object",
+                "required": [
+                  "query"
+                ],
+                "title": "SearchQuery"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "detail": {
+                      "items": {
+                        "properties": {
+                          "loc": {
+                            "items": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "integer"
+                                }
+                              ]
+                            },
+                            "type": "array",
+                            "title": "Location"
+                          },
+                          "msg": {
+                            "type": "string",
+                            "title": "Message"
+                          },
+                          "type": {
+                            "type": "string",
+                            "title": "Error Type"
+                          },
+                          "input": {
+                            "title": "Input"
+                          },
+                          "ctx": {
+                            "type": "object",
+                            "title": "Context"
+                          }
+                        },
+                        "type": "object",
+                        "required": [
+                          "loc",
+                          "msg",
+                          "type"
+                        ],
+                        "title": "ValidationError"
+                      },
+                      "type": "array",
+                      "title": "Detail"
+                    }
+                  },
+                  "type": "object",
+                  "title": "HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/messages": {
+      "post": {
+        "summary": "Add Messages",
+        "operationId": "add_messages_messages_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "group_id": {
+                    "type": "string",
+                    "title": "Group Id",
+                    "description": "The group id of the messages to add"
+                  },
+                  "messages": {
+                    "items": {
+                      "properties": {
+                        "content": {
+                          "type": "string",
+                          "title": "Content",
+                          "description": "The content of the message"
+                        },
+                        "uuid": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ],
+                          "title": "Uuid",
+                          "description": "The uuid of the message (optional)"
+                        },
+                        "name": {
+                          "type": "string",
+                          "title": "Name",
+                          "description": "The name of the episodic node for the message (optional)",
+                          "default": ""
+                        },
+                        "role_type": {
+                          "type": "string",
+                          "enum": [
+                            "user",
+                            "assistant",
+                            "system"
+                          ],
+                          "title": "Role Type",
+                          "description": "The role type of the message (user, assistant or system)"
+                        },
+                        "role": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ],
+                          "title": "Role",
+                          "description": "The custom role of the message to be used alongside role_type (user name, bot name, etc.)"
+                        },
+                        "timestamp": {
+                          "type": "string",
+                          "format": "date-time",
+                          "title": "Timestamp",
+                          "description": "The timestamp of the message"
+                        },
+                        "source_description": {
+                          "type": "string",
+                          "title": "Source Description",
+                          "description": "The description of the source of the message",
+                          "default": ""
+                        }
+                      },
+                      "type": "object",
+                      "required": [
+                        "content",
+                        "role_type",
+                        "role"
+                      ],
+                      "title": "Message"
+                    },
+                    "type": "array",
+                    "title": "Messages",
+                    "description": "The messages to add"
+                  }
+                },
+                "type": "object",
+                "required": [
+                  "group_id",
+                  "messages"
+                ],
+                "title": "AddMessagesRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "detail": {
+                      "items": {
+                        "properties": {
+                          "loc": {
+                            "items": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "integer"
+                                }
+                              ]
+                            },
+                            "type": "array",
+                            "title": "Location"
+                          },
+                          "msg": {
+                            "type": "string",
+                            "title": "Message"
+                          },
+                          "type": {
+                            "type": "string",
+                            "title": "Error Type"
+                          },
+                          "input": {
+                            "title": "Input"
+                          },
+                          "ctx": {
+                            "type": "object",
+                            "title": "Context"
+                          }
+                        },
+                        "type": "object",
+                        "required": [
+                          "loc",
+                          "msg",
+                          "type"
+                        ],
+                        "title": "ValidationError"
+                      },
+                      "type": "array",
+                      "title": "Detail"
+                    }
+                  },
+                  "type": "object",
+                  "title": "HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/healthcheck": {
+      "get": {
+        "summary": "Healthcheck",
+        "operationId": "healthcheck_healthcheck_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

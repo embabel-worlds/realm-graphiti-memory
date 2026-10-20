@@ -1,0 +1,34 @@
+# GRAPHITI MEMORY — a self-hosted Graphiti server's temporal knowledge graph as a child of the
+# world's shared `Memory` label (default-world types/memory.yml). Every node carries :Memory and
+# :GraphitiMemory, so:
+#
+#   MATCH (:Concept {value:'coffee'})-[r:RELEVANT_TO]->(m:Memory)          -- every memory system
+#   MATCH (:Concept {value:'coffee'})-[r:RELEVANT_TO]->(m:GraphitiMemory)  -- Graphiti alone
+#
+# A Graphiti fact is an EDGE of its graph with a validity window: valid_at (when it began to
+# hold), invalid_at (when it stopped), expired_at (when Graphiti retired it). The contract's
+# validFrom / validTo are that window, so "what was true in March" is a predicate on the node:
+#   MATCH (:Concept {value:'employer'})-[:RELEVANT_TO]->(m:GraphitiMemory)
+#   WHERE m.validFrom <= '2026-03-01' AND (m.validTo IS NULL OR m.validTo > '2026-03-01')
+# Curation: a fact Graphiti still holds is ACTIVE; one it has invalidated or expired is SUPERSEDED
+# and is read only when the query pins status:'SUPERSEDED' (the Memory lifecycle).
+- name: GraphitiMemory
+  parents: [Memory]
+  visibility: internal
+  userAnchor: false
+  description: "A fact in a Graphiti server's temporal memory graph — what Graphiti extracted from what it was told, with the window in which it held (m.validFrom / m.validTo). One of the memory systems behind :Memory; reach it from a free-text Concept via RELEVANT_TO (Graphiti's own hybrid search), or name :GraphitiMemory to read Graphiti alone. Per-match data on the EDGE: r.score (1.0 = Graphiti returned it), r.mode, r.rank (Graphiti's order)."
+  virtualJoins:
+    - anchorLabel: Concept
+      relationship: RELEVANT_TO
+      keyField: value
+      recordKeyField: matchedFor
+      producer: graphitiRecall
+      description: "Relevance of a Graphiti fact to a FREE-TEXT topic, by Graphiti's own hybrid search — \"what does Graphiti remember about X\". Seeded from a query literal, e.g. (:Concept {value:'coffee'})-[:RELEVANT_TO]->(:GraphitiMemory). Per-match data on the EDGE: r.score, r.mode, r.rank."
+  properties:
+    id:
+      description: "The fact's uuid in Graphiti — the node identity."
+      metadata:
+        identity: "true"
+    name: "Graphiti's name for the relation the fact expresses (e.g. DRINKS_AT)."
+    expired: "When Graphiti retired the fact, if it has (ISO-8601)."
+    episodes: "The uuids of the episodes (messages) the fact was extracted from — a LIST."

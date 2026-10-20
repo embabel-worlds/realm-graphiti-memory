@@ -1,0 +1,10 @@
+# The Graphiti server's HTTP API (the FastAPI `graph_service` the getzep/graphiti repo ships, image
+# zepai/graphiti), vendored from the running server's own GET /openapi.json with a `servers` entry
+# added (the served document carries none) and schema references inlined. The reference server has
+# no authentication — it is meant to sit beside the assistant, not on a network — so `auth: none`.
+# Point `servers[0].url` at where yours runs.
+- url: graphiti-openapi.json
+  name: graphiti
+  type: openapi
+  auth: none
+  operation-ids: [search_search_post]

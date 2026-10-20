@@ -1,0 +1,35 @@
+# Recall over a Graphiti server: POST /search runs Graphiti's hybrid (semantic + BM25, reranked)
+# search over the graph's edges — its FACTS — and returns up to max_facts of them. A `remote-search`
+# producer: Graphiti searches itself; nothing is ingested. `{query}` is the anchor's text.
+#
+# Graphiti's search result carries no score, so r.score is the neutral 1.0 ("Graphiti returned
+# it") and r.rank is the order Graphiti ranked them in. `group_ids` is left unset, which searches
+# every group the server holds: a server shared between users must be given the acting user's
+# group here (one realm install per group, or a per-user server).
+#
+# `compute:` maps the fact onto the Memory contract: the fact is the text; valid_at / invalid_at
+# are the window in which it held (validFrom / validTo); a fact Graphiti has not invalidated or
+# expired is ACTIVE, one it has is SUPERSEDED — a plain read returns what Graphiti currently holds
+# true, and a `status:'SUPERSEDED'` pin reads what it no longer does.
+- name: graphitiRecall
+  kind: remote-search
+  operation: search_search_post
+  args:
+    query: "{query}"
+    max_facts: 8
+  records: "$.facts[*]"
+  idField: uuid
+  k: 8
+  minScore: 0.0
+  compute:
+    text: "r.fact"
+    name: "r.name"
+    source: "'graphiti'"
+    confidence: "1.0"
+    status: "CASE WHEN r.invalid_at IS NULL AND r.expired_at IS NULL THEN 'ACTIVE' ELSE 'SUPERSEDED' END"
+    created: "r.created_at"
+    revised: "coalesce(r.expired_at, r.created_at)"
+    validFrom: "r.valid_at"
+    validTo: "r.invalid_at"
+    expired: "r.expired_at"
+    episodes: "r.episodes"
