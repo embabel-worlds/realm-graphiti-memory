@@ -45,6 +45,20 @@ holds. A server shared between users must be given the acting user's group there
 A plain read returns ACTIVE facts; pin `{status:'SUPERSEDED'}` on the node to read what Graphiti
 has invalidated. That is the `Memory` lifecycle, declared once in the default world and inherited.
 
+## The ladder
+
+The shared label is a migration path, and this realm is one rung of it.
+
+- **Mirror** — install the realm and point `servers[0].url` at your Graphiti server; its facts
+  answer under `:Memory` beside the assistant's own from the next query.
+- **Compare** — `memory_bakeoff {topic}` lists what each system recalls, one row per memory with
+  `system` naming it; `memory_systems` counts per system.
+- **Promote** — `gateway.memory.promote({text, source, id})` copies a fact into the assistant's own
+  memory; the row then reads `status: PROMOTED` and leaves plain `:Memory` reads.
+- **Retire** — uninstall the realm; every `:Memory` query keeps answering from the systems that remain.
+
+`source` (`'graphiti'`) and `status` are stamped by the producer's `compute:` block, as the table above says.
+
 ## Zep Cloud
 
 Zep's hosted service is the same engine with a key and a per-user graph: see `realm-zep-memory`.
